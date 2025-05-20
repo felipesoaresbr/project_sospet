@@ -1,30 +1,46 @@
 from django.shortcuts import render
-from .models import User
+from .models import UserForm, User
 import json
+import os
+from django.http import JsonResponse
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(BASE_DIR, 'users.storage.json')
+
+def add_user_to_storage(user_data):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            users = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        users=[]
+    
+    existing_emails = {user['email'] for user in users}
+    if user_data['email'] in existing_emails:
+        raise ValueError('Email já cadastrado.')
+                  
+    new_id = max((user['id'] for user in users), default=0) + 1
+    user_data['id'] = new_id
+
+    users.append(user_data)
+
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump(users, f, indent=4, ensure_ascii=False)
+    
 
 def login(request):
     return render(request, 'login.html')
 
 def registerController(request):
-    errors = []
     if request.method == 'POST':
         name = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
         password_repeat = request.POST.get('password-repeat')
 
-        if not name or not email or not password or not password_repeat:
-            errors.append('Todos os campos devem ser preenchidos.')
-        if password != password_repeat:
-            errors.append('Senhas não coincidem.')
-        if len(password) < 6:
-            errors.append('Senha deve conter pelo menos 6 caractéres.')
+        form = UserForm(name, email, password, password_repeat)
 
-        if errors:
-            for error in errors:
-                print(error)
-        else:
-            user = User(username=name, email=email, password=password)
-            print(f"Usuário criado: {user.username}, {user.email}")
+        if form.is_valid() is True:
+            user = User(form.username, form.email, form.password)
+            add_user_to_storage(user.__dict__)
 
     return render(request, 'login.html')
