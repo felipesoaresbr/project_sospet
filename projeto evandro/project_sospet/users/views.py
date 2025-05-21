@@ -27,10 +27,11 @@ def add_user_to_storage(user_data):
         json.dump(users, f, indent=4, ensure_ascii=False)
     
 
-def login(request):
+def index(request):
     return render(request, 'login.html')
 
 def registerController(request):
+    context = {}
     if request.method == 'POST':
         name = request.POST.get('username')
         email = request.POST.get('email')
@@ -39,8 +40,14 @@ def registerController(request):
 
         form = UserForm(name, email, password, password_repeat)
 
-        if form.is_valid() is True:
+        errors = form.is_valid()
+        if errors is True:
             user = User(form.username, form.email, form.password)
-            add_user_to_storage(user.__dict__)
+            add_user_to_storage(user.to_dict())
+        else:
+            context['register_errors'] = errors
 
+    return render(request, 'login.html', context)
+
+def loginController(request):
     return render(request, 'login.html')

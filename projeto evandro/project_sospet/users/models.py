@@ -7,16 +7,24 @@ class UserForm:
     def __init__(self, username, email, password, password_repeat):
         self.username = username
         self.email = email
-        self.password = password
-        self.password_repeat = password_repeat
+        self.__password = password
+        self.__password_repeat = password_repeat
+
+    @property
+    def password(self):
+        return self.__password
+
+    @property
+    def password_repeat(self):
+        return self.__password_repeat
 
     def is_valid(self):
         errors = []
-        if not self.username or not self.email or not self.password or not self.password_repeat:
+        if not self.username or not self.email or not self.__password or not self.__password_repeat:
             errors.append('Todos os campos devem ser preenchidos.')
-        if len(self.password) < 6:
+        if len(self.__password) < 6:
             errors.append('Senha deve conter ao menos 6 caractéres.')
-        if self.password != self.password_repeat:
+        if self.__password != self.__password_repeat:
             errors.append('Senhas não coincidem.')
             
         return errors if errors else True
@@ -33,3 +41,10 @@ class User:
 
     def check_hash_password(self, password):
         return self.__hash_password(password) == self.__hashed_password
+
+    def to_dict(self):
+        return {
+            'username': self.username,
+            'email': self.email,
+            'hashed_password': self.__hashed_password
+        }

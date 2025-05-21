@@ -1,8 +1,9 @@
 [
+
     {
-        "username": "Felipe Soares",
-        "email": "felipe@gmail.com",
-        "_User__hashed_password": "8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414",
+        "username": "João Pedro",
+        "email": "joaopedro@outlook.com",
+        "hashed_password": "2c2ada8d054c06da00b46987c4f68a3138c9c0636578f8f1ce207765bb619280",
         "id": 1
     }
 ]
